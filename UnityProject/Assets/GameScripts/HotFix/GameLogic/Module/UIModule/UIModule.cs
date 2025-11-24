@@ -475,6 +475,7 @@ namespace GameLogic
             window.InternalRefresh();
             OnSortWindowDepth(window.WindowLayer);
             OnSetWindowVisible();
+            window.PlayOpenAnim();
         }
 
         private void OnSortWindowDepth(int layer)

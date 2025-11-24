@@ -287,6 +287,7 @@ namespace GameLogic
                 _isCreate = true;
                 Inject();
                 ScriptGenerator();
+                BindAnimProperty();
                 BindMemberProperty();
                 RegisterEvent();
                 OnCreate();
@@ -465,5 +466,21 @@ namespace GameLogic
                 HideTimerId = 0;
             }
         }
+
+        #region UI动画
+        public virtual float UICloseAnimDuraion { set; get; } = 0;
+        internal virtual void BindAnimProperty()
+        {
+
+        }
+        internal virtual void PlayOpenAnim()
+        {
+
+        }
+        internal virtual void PlayCloseAnim()
+        {
+
+        }
+        #endregion
     }
 }
