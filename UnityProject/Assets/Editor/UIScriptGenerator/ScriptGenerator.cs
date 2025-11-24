@@ -57,7 +57,7 @@ namespace TEngine.Editor.UI
             return !ScriptGeneratorSetting.Instance.UseBindComponent;
         }
 
-        private static void Generate(bool includeListener, bool isUniTask = false)
+        public static string Generate(bool includeListener, bool isUniTask = false)
         {
             var root = Selection.activeTransform;
             if (root != null)
@@ -128,9 +128,13 @@ namespace TEngine.Editor.UI
                 te.text = strFile.ToString();
                 te.SelectAll();
                 te.Copy();
+                Debug.Log($"脚本已生成到剪贴板，请自行Ctl+V粘贴");
+                return strFile.ToString();
             }
-
-            Debug.Log($"脚本已生成到剪贴板，请自行Ctl+V粘贴");
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public static void Ergodic(Transform root, Transform transform, ref StringBuilder strVar, ref StringBuilder strBind, ref StringBuilder strOnCreate,
