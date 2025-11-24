@@ -193,7 +193,7 @@ namespace Doozy.Editor.UI
             GUILayout.Space(15);
             if (GUILayout.Button("生成代码"))
             {
-                string content = TEngine.Editor.UI.ScriptGenerator.Generate(false);
+                string content = TEngine.Editor.UI.ScriptGenerator.GeneratePartialClass();
                 string windowName = m_UIView.gameObject.name;
                 string path = Application.dataPath + "/GameScripts/HotFix/GameLogic/UI/" + windowName + "/" + windowName + ".Generate.cs";
                 WriteStringByFile(path, content);

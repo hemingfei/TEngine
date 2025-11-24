@@ -57,7 +57,7 @@ namespace TEngine.Editor.UI
             return !ScriptGeneratorSetting.Instance.UseBindComponent;
         }
 
-        public static string Generate(bool includeListener, bool isUniTask = false)
+        private static void Generate(bool includeListener, bool isUniTask = false)
         {
             var root = Selection.activeTransform;
             if (root != null)
@@ -128,7 +128,74 @@ namespace TEngine.Editor.UI
                 te.text = strFile.ToString();
                 te.SelectAll();
                 te.Copy();
-                Debug.Log($"脚本已生成到剪贴板，请自行Ctl+V粘贴");
+            }
+            Debug.Log($"脚本已生成到剪贴板，请自行Ctl+V粘贴");
+        }
+
+        public static string GeneratePartialClass(bool isUniTask = false)
+        {
+            var root = Selection.activeTransform;
+            if (root != null)
+            {
+                StringBuilder strVar = new StringBuilder();
+                StringBuilder strBind = new StringBuilder();
+                StringBuilder strOnCreate = new StringBuilder();
+                StringBuilder strCallback = new StringBuilder();
+                Ergodic(root, root, ref strVar, ref strBind, ref strOnCreate, ref strCallback, isUniTask);
+                StringBuilder strFile = new StringBuilder();
+
+
+#if ENABLE_TEXTMESHPRO
+                    strFile.Append("using TMPro;\n");
+#endif
+                if (isUniTask)
+                {
+                    strFile.Append("using Cysharp.Threading.Tasks;\n");
+                }
+
+                strFile.Append("using UnityEngine;\n");
+                strFile.Append("using UnityEngine.UI;\n");
+                strFile.Append("using TEngine;\n\n");
+                strFile.Append($"namespace {ScriptGeneratorSetting.GetUINameSpace()}\n");
+                strFile.Append("{\n");
+
+                var widgetPrefix = $"{(ScriptGeneratorSetting.GetCodeStyle() == UIFieldCodeStyle.MPrefix ? "m_" : "_")}{ScriptGeneratorSetting.GetWidgetName()}";
+                if (root.name.StartsWith(widgetPrefix))
+                {
+                    strFile.Append("\tpartial class " + root.name.Replace(widgetPrefix, "") + " : UIWidget\n");
+                }
+                else
+                {
+                    strFile.Append("\tpartial class " + root.name + "\n");
+                }
+
+                strFile.Append("\t{\n");
+
+
+                // 脚本工具生成的代码
+                strFile.Append("\t\t#region 脚本工具生成的代码\n");
+                strFile.Append("\n");
+                strFile.Append(strVar);
+                strFile.Append("\n");
+                strFile.Append("\t\tprotected override void ScriptGenerator()\n");
+                strFile.Append("\t\t{\n");
+                strFile.Append(strBind);
+                strFile.Append(strOnCreate);
+                strFile.Append("\t\t}\n");
+                strFile.Append("\n");
+                strFile.Append("\t\t#endregion");
+
+
+                strFile.Append("\n\n");
+                // #region 事件
+                strFile.Append("\t\t/*\n");
+                strFile.Append("\t\t#region 事件\n\n");
+                strFile.Append(strCallback);
+                strFile.Append("\n\t\t#endregion\n");
+                strFile.Append("\t\t*/\n\n");
+
+                strFile.Append("\t}\n");
+                strFile.Append("}\n");
                 return strFile.ToString();
             }
             else
@@ -136,7 +203,6 @@ namespace TEngine.Editor.UI
                 return string.Empty;
             }
         }
-
         public static void Ergodic(Transform root, Transform transform, ref StringBuilder strVar, ref StringBuilder strBind, ref StringBuilder strOnCreate,
             ref StringBuilder strCallback, bool isUniTask)
         {
